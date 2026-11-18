@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Misi Sortir Pintar: Dasar KKA</title>
+<style>
+:root{--bg:#10202e;--panel:#183247;--ink:#f4f6f8;--mut:#b7c6d3;--amb:#ffb703;--grn:#2ec4a0;--red:#ff6b6b;--line:#2f5470}
+@media (prefers-color-scheme:light){:root{--bg:#10202e}}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%;background:#0a141d;font-family:"Trebuchet MS",Verdana,sans-serif;color:var(--ink)}
+body{display:flex;align-items:center;justify-content:center;overflow:hidden}
+#stage{width:min(100vw,177.78vh);aspect-ratio:16/9;background:var(--bg);position:relative;display:flex;flex-direction:column;overflow:hidden}
+button{font:inherit;color:inherit;cursor:pointer;border:0;border-radius:.6em;min-height:2.6em;padding:.5em 1.1em;background:var(--line);transition:transform .1s}
+button:active{transform:scale(.97)}
+button:focus-visible{outline:.2em solid var(--amb)}
+.pri{background:var(--amb);color:#1a1a1a;font-weight:700}
+#hud{display:flex;align-items:center;gap:1em;padding:.8em 1.6em;background:var(--panel);font-size:1.5em}
+#hud .t{font-weight:700;margin-right:auto}
+.pill{min-height:2em;width:2em;padding:0;border-radius:50%;font-weight:700}
+.pill.cur{background:var(--amb);color:#111}.pill.ok{background:var(--grn);color:#08241d}
+#body{flex:1;padding:1.2em 2em;font-size:1.7em;display:flex;flex-direction:column;gap:.6em;overflow:hidden}
+#fb{min-height:3.2em;padding:.5em 2em;font-size:1.5em;display:flex;align-items:center;gap:1em;background:var(--panel);border-top:.15em solid var(--line)}
+#fb.ok{border-color:var(--grn)}#fb.bad{border-color:var(--red)}
+#fb span{flex:1}
+h1{font-size:2.6em;line-height:1.1}h2{font-size:1.25em}p{line-height:1.4}
+.mut{color:var(--mut)}
+.center{align-items:center;justify-content:center;text-align:center}
+.row{display:flex;gap:.8em;flex-wrap:wrap}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:1em;flex:1;min-height:0}
+.card{background:var(--panel);border:.12em solid var(--line);border-radius:.7em;padding:.5em .8em;text-align:left;font-size:.8em}
+.card.sel{border-color:var(--amb)}.card.done{border-color:var(--grn);background:#12463f}
+.card.err{border-color:var(--red)}
+.slot{background:#0c1823;border:.12em dashed var(--line);border-radius:.6em;padding:.35em .8em;font-size:.78em;min-height:1.9em}
+.slot.f{border:.12em solid var(--grn);background:#12463f}
+pre{background:#0c1823;border-radius:.6em;padding:.6em;font-size:.85em}
+pre .ln{display:block;padding:.15em .5em;border-radius:.3em;cursor:pointer;font-family:Consolas,monospace}
+pre .ln:hover{background:#243f56}pre .ln.err{background:#6b2a2a}pre .ln.ok{background:#12463f}
+.chips{display:flex;gap:.5em;flex-wrap:wrap}
+.chip{width:3.2em;height:3.2em;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.6em;font-weight:700;color:#111;border:.2em solid transparent}
+.chip.bad{border-color:var(--red);outline:.15em solid var(--red)}
+.mer{display:block;width:100%}
+input[type=range]{width:100%;height:2.5em;accent-color:var(--amb)}
+.bar{height:1.1em;background:#0c1823;border-radius:1em;overflow:hidden}.bar i{display:block;height:100%;background:var(--grn);transition:width .2s}
+.ov{position:absolute;inset:0;background:#0a141dee;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1em;text-align:center;font-size:1.8em;z-index:5}
+</style></head><body>
+<div id="stage"><div id="hud"></div><div id="body"></div><div id="fb"><span id="fbt"></span><span id="fba" style="flex:0"></span></div></div>
+<script>
+const $=id=>document.getElementById(id);
+const N=5, NAMA=["Urutan Algoritma","Istilah KKA","Cari Bug","Latih Model AI","Etika AI"];
+let S={scr:"home",lv:0,score:0,lives:5,pts:[0,0,0,0,0],done:[0,0,0,0,0]},m=0,L={},fbOk=false;
+function fit(){const w=$("stage").clientWidth;$("stage").style.fontSize=(w/100)+"px"}
+addEventListener("resize",fit);
+function fb(t,c,act){$("fb").className=c||"";$("fbt").textContent=t;$("fba").innerHTML=act||""}
+function hud(){const h=$("hud");if(S.scr!="play"){h.style.display="none";return}h.style.display="flex";
+ let p="";for(let i=0;i<N;i++)p+=`<button class="pill ${i==S.lv?"cur":S.done[i]?"ok":""}" onclick="go(${i})" aria-label="Level ${i+1}: ${NAMA[i]}">${i+1}</button>`;
+ h.innerHTML=`<span class="t">Level ${S.lv+1} dari ${N}: ${NAMA[S.lv]}</span>${p}<span>Nyawa: ${"♥".repeat(S.lives)}${"♡".repeat(5-S.lives)}</span><span>Skor: ${S.score}</span><button onclick="scr('home')">Menu</button>`}
+function scr(s){S.scr=s;hud();const b=$("body");b.className="";fb("","");$("fb").style.display=s=="play"?"flex":"none";
+ if(s=="home"){b.className="center";b.innerHTML=`<h1>Misi Sortir Pintar</h1><p class="mut" style="max-width:34em">Bantu pabrik tomat mengatur mesin sortir otomatis. Kamu akan belajar algoritma, koding dasar, dan kecerdasan artifisial lewat 5 level.</p><div class="row"><button class="pri" onclick="newGame()">Mulai Misi</button><button onclick="scr('guide')">Panduan</button></div>`}
+ if(s=="guide"){b.innerHTML=`<h1 style="font-size:2em">Panduan</h1><p>1. Ada 5 level. Kamu boleh membuka level mana saja lewat tombol nomor di atas.</p><p>2. Setiap level punya cara main berbeda: mengurutkan, mencocokkan, mencari kesalahan, mengatur model AI, dan mengambil keputusan.</p><p>3. Jawaban salah mengurangi nyawa (♥) dan skor level. Maksimal 20 poin per level, total 100.</p><p>4. Setelah tiap tindakan, kotak umpan balik di bawah menjelaskan hasilnya.</p><div class="row"><button class="pri" onclick="newGame()">Mulai Misi</button><button onclick="scr('home')">Kembali</button></div>`}
+ if(s=="play")lvl(S.lv);
+ if(s=="result")result();
+ if(s=="credit"){b.className="center";b.innerHTML=`<h1 style="font-size:2em">Informasi Kreator</h1><p>Dikembangkan oleh: <b>[Nama Kreator, gelar]</b></p><p class="mut">[Nama sekolah / organisasi]</p><p class="mut">Seluruh ilustrasi dibuat dengan kode HTML/CSS. Teks dan rancangan game dibuat dengan bantuan AI (Claude).</p><button onclick="scr('result')">Kembali</button>`}}
+function newGame(){S={scr:"play",lv:0,score:0,lives:5,pts:[0,0,0,0,0],done:[0,0,0,0,0]};scr("play")}
+function go(i){S.lv=i;scr("play")}
+function tot(){S.score=S.pts.reduce((a,b)=>a+b,0)}
+function bad(msg){m++;S.lives--;hud();fb(msg,"bad");if(S.lives<=0){const o=document.createElement("div");o.className="ov";o.innerHTML=`<b>Nyawa habis</b><span class="mut">Skor kamu ${S.score}. Pelajari lagi dan coba lagi.</span><button class="pri" onclick="newGame()">Main Lagi</button>`;$("stage").appendChild(o)}}
+function win(msg){const p=Math.max(4,20-4*m);S.pts[S.lv]=Math.max(S.pts[S.lv],p);S.done[S.lv]=1;tot();hud();
+ const last=S.lv==N-1;fb(msg+` (+${p} poin)`,"ok",`<button class="pri" onclick="${last?"scr('result')":"go("+(S.lv+1)+")"}">${last?"Lihat Hasil":"Level Berikutnya"}</button>`)}
+function mcq(t,opts,c,why,next){const b=$("body");b.insertAdjacentHTML("beforeend",`<p>${t}</p><div id="o" class="row" style="flex-direction:column"></div>`);
+ const o=b.lastElementChild;opts.forEach((x,i)=>{const e=document.createElement("button");e.className="card";e.textContent=x;e.onclick=()=>{if(i==c){e.className="card done";[...o.children].forEach(k=>k.disabled=true);next(why)}else{e.className="card err";bad("Belum tepat. "+why[1])}};o.appendChild(e)})}
+function lvl(i){m=0;L={};const b=$("body");
+ const f=[l1,l2,l3,l4,l5][i];f(b)}
+/* Level 1 */
+function l1(b){const st=["Mulai","Ambil satu tomat dari ban berjalan","Baca warna tomat dengan sensor","Jika merah, masukkan ke kotak Matang. Jika tidak, ke kotak Mentah","Ulangi sampai ban kosong","Selesai"],ord=[3,0,5,2,4,1];L.n=0;
+ fb("Susun algoritma mesin sortir. Ketuk langkah yang harus dilakukan lebih dulu.","");
+ const draw=()=>{b.innerHTML=`<h2>Susun langkah mesin sortir tomat dari awal sampai akhir</h2><div class="grid2"><div style="display:flex;flex-direction:column;gap:.4em">${st.map((s,k)=>`<div class="slot ${k<L.n?"f":""}">${k+1}. ${k<L.n?s:""}</div>`).join("")}</div><div style="display:flex;flex-direction:column;gap:.4em">${ord.map(k=>k<L.n?"":`<button class="card" onclick="p1(${k})">${st[k]}</button>`).join("")}</div></div>`};
+ L.d=draw;L.st=st;draw()}
+function p1(k){if(k==L.n){L.n++;fb("Benar. Langkah "+L.n+" sudah di tempatnya.","ok");L.d();if(L.n==6)win("Algoritma selesai. Urutan langkah yang runtut membuat mesin bekerja benar.")}else bad("Belum. Algoritma harus dimulai dari langkah yang paling awal dulu.")}
+/* Level 2 */
+function l2(b){L.pr=[["Input","Sensor warna membaca tomat"],["Proses","Membandingkan nilai warna dengan syarat jika"],["Output","Lampu hijau menyala dan tomat masuk kotak"],["Data latih","Ribuan foto tomat yang sudah diberi label"]];L.ro=[2,0,3,1];L.sel=-1;L.dn=[];fb("Pilih istilah di kiri, lalu pasangannya di kanan.","");
+ const draw=()=>{b.innerHTML=`<h2>Pasangkan istilah dengan contohnya di mesin sortir</h2><div class="grid2"><div style="display:flex;flex-direction:column;gap:.5em">${L.pr.map((p,k)=>`<button class="card ${L.dn.includes(k)?"done":L.sel==k?"sel":""}" onclick="s2(${k})">${p[0]}</button>`).join("")}</div><div style="display:flex;flex-direction:column;gap:.5em">${L.ro.map(k=>`<button class="card ${L.dn.includes(k)?"done":""}" onclick="r2(${k})">${L.pr[k][1]}</button>`).join("")}</div></div>`};L.d=draw;draw()}
+function s2(k){if(L.dn.includes(k))return;L.sel=k;L.d()}
+function r2(k){if(L.dn.includes(k))return;if(L.sel<0){fb("Pilih istilah di kolom kiri dulu.","");return}
+ if(L.sel==k){L.dn.push(k);L.sel=-1;L.d();fb("Cocok. "+L.pr[k][0]+" = "+L.pr[k][1]+".","ok");if(L.dn.length==4)win("Semua istilah cocok. Input, proses, output, dan data adalah dasar setiap sistem KKA.")}else bad("Kurang cocok. Pikirkan perannya di alur mesin: apa yang masuk, diproses, dan keluar?")}
+/* Level 3 */
+function l3(b){const c=['jumlah = 0','untuk setiap tomat di ban:','    jika warna == "merah":','        jumlah = jumlah - 1','tampilkan jumlah'];fb("Program ini seharusnya menghitung tomat merah, tetapi hasilnya negatif.","");
+ b.innerHTML=`<h2>Cari bug: ketuk baris yang salah</h2><pre>${c.map((x,k)=>`<span class="ln" id="ln${k}" onclick="p3(${k})">${x.replace(/ /g,"&nbsp;")}</span>`).join("")}</pre>`}
+function p3(k){if(k==3){$("ln3").className="ln ok";fb("Baris yang salah ketemu. Sekarang pilih perbaikannya.","ok");document.querySelectorAll(".ln").forEach(e=>e.onclick=null);
+ mcq("Perbaikan apa yang benar?",["jumlah = jumlah * 0","jumlah = jumlah + 1","hapus baris ini"],1,"Jumlah harus bertambah satu setiap kali ditemukan tomat merah.",()=>win("Bug diperbaiki. Menelusuri baris demi baris adalah cara debugging yang efektif."))}else{$("ln"+k).className="ln err";bad("Baris itu sudah benar. Perhatikan operasi pada variabel jumlah.")}}
+/* Level 4 */
+function l4(b){L.s=[[12,0],[25,0],[38,0],[47,0],[52,0],[56,1],[63,1],[75,1],[84,1],[93,1]];L.t=20;fb("Geser batas kematangan. Lingkaran bergaris merah berarti tebakan model salah.","");
+ b.innerHTML=`<h2>Latih model: tentukan batas skor kemerahan</h2><p class="mut" style="font-size:.8em">Model menebak Matang jika skor kemerahan lebih besar atau sama dengan batas. Sampel diberi label oleh petani.</p><div class="chips" id="ch"></div><div class="mer" style="height:1.2em;border-radius:1em;background:linear-gradient(90deg,#8bc34a,#ffc107,#e53935)"></div><input type="range" min="0" max="100" value="20" id="rg" aria-label="Batas" oninput="u4()"><p id="ac"></p><div class="bar"><i id="bar"></i></div><button class="pri" onclick="k4()" style="align-self:flex-start">Kunci model</button>`;u4()}
+function u4(){L.t=+$("rg").value;let ok=0;$("ch").innerHTML=L.s.map(([v,y])=>{const pr=v>=L.t?1:0;if(pr==y)ok++;return`<div class="chip ${pr==y?"":"bad"}" style="background:${y?"#e53935":"#8bc34a"}" title="">${v}</div>`}).join("");L.a=ok*10;$("ac").textContent=`Batas ${L.t}. Akurasi: ${L.a}% (warna isi = label asli)`;$("bar").style.width=L.a+"%"}
+function k4(){if(L.a>=90)win("Model terkunci dengan akurasi "+L.a+"%. Kualitas data latih dan pengaturan model menentukan akurasi.");else bad("Akurasi baru "+L.a+"%. Cari batas yang membuat semua lingkaran tidak bergaris merah.")}
+/* Level 5 */
+function l5(b){b.innerHTML=`<h2>Studi kasus: etika kecerdasan artifisial</h2>`;fb("Pilih keputusan terbaik untuk tiap kasus.","");
+ mcq("Kasus 1: Mesin sering menolak tomat kuning varietas lokal karena data latih hanya berisi tomat merah. Apa langkah terbaik?",["Biarkan, karena tomat merah paling umum","Tambahkan foto tomat kuning berlabel ke data latih","Matikan semua sensor"],1,"Data yang beragam mengurangi bias dan membuat model adil.",()=>{fb("Tepat. Data yang beragam mengurangi bias.","ok");
+ mcq("Kasus 2: Kamera pabrik merekam wajah pekerja untuk melatih model tanpa memberi tahu mereka. Apa yang benar?",["Tidak masalah, kamera sudah terpasang","Minta izin dan jelaskan tujuan data, lalu simpan seperlunya","Jual data ke pihak lain"],1,"Data pribadi dilindungi. Perlu izin, tujuan jelas, dan penyimpanan seperlunya.",()=>win("Keputusan etis menjaga keadilan dan privasi."))})}
+function result(){const b=$("body");b.className="center";const t=S.score,s=t>=90?"★★★":t>=60?"★★☆":"★☆☆";
+ b.innerHTML=`<h1 style="font-size:2.2em">Misi Selesai</h1><p style="font-size:2em;color:var(--amb)">${s}</p><p>Skor akhir: <b>${t} dari 100</b></p><p class="mut" style="font-size:.8em">Kamu berlatih algoritma, istilah KKA, debugging, pelatihan model AI, dan etika data, kemampuan yang dipakai teknisi di bidang Teknologi Informasi dan manufaktur.</p><div class="row"><button class="pri" onclick="newGame()">Main Lagi</button><button onclick="scr('home')">Menu</button><button onclick="scr('credit')">Informasi Kreator</button></div>`;$("fb").style.display="none"}
+fit();scr("home");
+</script></body></html>
